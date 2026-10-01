@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}FinBot AI Financial Advisor - Personal Finance Advisor Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                <i class="bi bi-robot text-warning"></i> FinBot Financial Advisor
+            </h2>
+            <p class="text-muted small mb-0">AI-powered personalized financial diagnostic analyzing your real-time cash flow, categories, and targets.</p>
+        </div>
+        <div>
+            <span class="badge bg-dark text-warning p-2 px-3 rounded-pill">
+                <i class="bi bi-cpu-fill me-1"></i> Mode: {{ initial_advice.mode }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Health Score & Metrics Summary Bar -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card p-3 h-100 border-0 shadow-sm bg-dark-slate text-white">
+                <span class="text-warning small text-uppercase fw-bold">Financial Health Score</span>
+                <div class="d-flex align-items-center gap-2 mt-2">
+                    <h2 class="fw-bold text-warning mb-0">{{ health.score }}<span class="fs-6 text-light text-opacity-50">/100</span></h2>
+                    <span class="badge bg-{{ health.color }} rounded-pill">{{ health.rating }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 h-100 border-0 shadow-sm">
+                <span class="text-muted small text-uppercase fw-bold">Active Month Income</span>
+                <h4 class="fw-bold text-success mb-0 mt-2">{{ overview.month_income|inr }}</h4>
+                <small class="text-muted">{{ overview.month_name }}</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 h-100 border-0 shadow-sm">
+                <span class="text-muted small text-uppercase fw-bold">Active Month Expenses</span>
+                <h4 class="fw-bold text-danger mb-0 mt-2">{{ overview.month_expense|inr }}</h4>
+                <small class="text-muted">{{ overview.month_name }}</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 h-100 border-0 shadow-sm">
+                <span class="text-muted small text-uppercase fw-bold">Net Monthly Surplus</span>
+                <h4 class="fw-bold {% if overview.month_balance >= 0 %}text-success{% else %}text-danger{% endif %} mb-0 mt-2">
+                    {{ overview.month_balance|inr }}
+                </h4>
+                <small class="text-muted">Available for savings & goals</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Chat and Advisory Area -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-chat-left-text-fill text-primary me-2"></i> Advisor Conversation
+                    </h5>
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="location.reload();">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh Analysis
+                    </button>
+                </div>
+
+                <!-- Chat History / Advice Area -->
+                <div class="finbot-chat-container mb-3" id="finbotChatContainer">
+                    <!-- Initial Assessment Bubble -->
+                    <div class="chat-bubble chat-bubble-bot">
+                        <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-2">
+                            <span class="badge bg-dark-slate text-warning fw-semibold">
+                                <i class="bi bi-robot me-1"></i> {{ initial_advice.mode }}
+                            </span>
+                            <small class="text-muted">Automated Diagnostic</small>
+                        </div>
+                        <div class="finbot-content" id="initialAdviceText">
+                            <!-- Raw Markdown will be rendered by JS marked -->
+                            {{ initial_advice.advice }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Suggested Prompts -->
+                <div class="mb-3">
+                    <span class="small text-muted d-block mb-2">💡 <strong>Quick Financial Prompts:</strong></span>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="quick-prompt-btn" data-prompt="How can I cut down my highest expense category this month?">
+                            ✂️ Cut highest expense
+                        </button>
+                        <button type="button" class="quick-prompt-btn" data-prompt="Evaluate my monthly spending using the 50/30/20 budget framework.">
+                            📊 Apply 50/30/20 rule
+                        </button>
+                        <button type="button" class="quick-prompt-btn" data-prompt="What monthly savings amount do I need to achieve my active financial goals on time?">
+                            🎯 Goal completion plan
+                        </button>
+                        <button type="button" class="quick-prompt-btn" data-prompt="Give me 3 practical tips to improve my financial health score.">
+                            📈 Improve health score
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Query Input Box -->
+                <div class="input-group">
+                    <input type="text" class="form-control" id="finbotQuestionInput" placeholder="Ask FinBot anything about your money, budget, savings, or goals..." aria-label="Ask FinBot">
+                    <button class="btn btn-warning fw-semibold px-4" type="button" id="finbotSendBtn">
+                        <i class="bi bi-send-fill me-1"></i> Ask FinBot
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Diagnostic Health Breakdown -->
+        <div class="col-lg-4">
+            <div class="card p-3 p-md-4 border-0 shadow-sm mb-4">
+                <h6 class="fw-bold text-uppercase text-muted small mb-3">Diagnostic Health Factors</h6>
+                <div class="d-flex flex-column gap-3">
+                    {% for insight in health.insights %}
+                    <div class="p-2.5 rounded-3 bg-light border small d-flex align-items-start gap-2">
+                        <i class="bi bi-check2-circle text-primary fs-6 mt-0.5"></i>
+                        <span>{{ insight }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card p-3 p-md-4 border-0 shadow-sm bg-light">
+                <h6 class="fw-bold mb-2">💡 About FinBot AI</h6>
+                <p class="small text-muted mb-2">
+                    FinBot directly reads your transactions from the database, calculating actual spending variance, category weight, and goals trajectory.
+                </p>
+                <p class="small text-secondary mb-0">
+                    <strong>API Status:</strong> {% if initial_advice.mode.startswith('Google Gemini') %}<span class="text-success fw-semibold">Gemini AI Active</span>{% else %}<span class="text-primary fw-semibold">Local Fallback Active</span>{% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/finbot.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Parse the initial markdown content
+    const initialDiv = document.getElementById('initialAdviceText');
+    if (initialDiv && window.marked) {
+        const raw = initialDiv.textContent;
+        initialDiv.innerHTML = marked.parse(raw);
+    }
+});
+</script>
+{% endblock %}

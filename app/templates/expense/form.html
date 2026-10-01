@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}{% if expense %}Edit Expense{% else %}Add Expense{% endif %} - Personal Finance Advisor Bot{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-{% if expense %}pencil-square{% else %}dash-circle-fill text-danger{% endif %} me-2"></i>
+                        {% if expense %}Edit Expense Record{% else %}Record New Expense{% endif %}
+                    </h5>
+                    <a href="{{ url_for('expense.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                        <i class="bi bi-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="amount" class="form-label fw-semibold text-secondary small">Expense Amount (in ₹ INR) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-danger fw-bold">₹</span>
+                                <input type="number" step="0.01" min="0.01" class="form-control form-control-lg" id="amount" name="amount" value="{{ expense.amount if expense else '' }}" placeholder="0.00" required autofocus>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label fw-semibold text-secondary small">Expense Category *</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="" disabled {% if not expense %}selected{% endif %}>Select spending category</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat }}" {% if expense and expense.category == cat %}selected{% endif %}>{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label fw-semibold text-secondary small">Date Spent *</label>
+                            <input type="date" class="form-control" id="date" name="date" value="{{ expense.date.strftime('%Y-%m-%d') if expense else (today.strftime('%Y-%m-%d') if today else '') }}" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-semibold text-secondary small">Description / Merchant (Optional)</label>
+                            <input type="text" class="form-control" id="description" name="description" value="{{ expense.description if expense else '' }}" placeholder="e.g. Swiggy order, Metro recharge, Amazon purchase">
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger flex-grow-1 py-2 fw-semibold rounded-3">
+                                <i class="bi bi-check-lg me-1"></i> {% if expense %}Save Changes{% else %}Save Expense Record{% endif %}
+                            </button>
+                            <a href="{{ url_for('expense.index') }}" class="btn btn-light py-2 rounded-3">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

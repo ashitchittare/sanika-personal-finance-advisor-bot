@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses - Personal Finance Advisor Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Expense Management</h2>
+            <p class="text-muted small mb-0">Record, categorize, and control your day-to-day spending.</p>
+        </div>
+        <a href="{{ url_for('expense.add') }}" class="btn btn-danger rounded-pill px-4 shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add New Expense
+        </a>
+    </div>
+
+    <!-- Filters & Summary Card -->
+    <div class="card p-3 mb-4 bg-white border-0 shadow-sm">
+        <div class="row align-items-center g-3">
+            <div class="col-md-5">
+                <span class="text-muted small text-uppercase fw-bold">Total Expenses Filtered</span>
+                <h3 class="fw-bold text-danger mb-0 mt-1">{{ total_expense|inr }}</h3>
+            </div>
+            <div class="col-md-7">
+                <form method="GET" action="{{ url_for('expense.index') }}" class="d-flex flex-wrap gap-2 justify-content-md-end align-items-center">
+                    <label for="category" class="small fw-semibold text-secondary">Filter by Category:</label>
+                    <select name="category" id="category" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                        <option value="">All Categories ({{ expenses|length }})</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if selected_category %}
+                    <a href="{{ url_for('expense.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expense History Table -->
+    <div class="card p-3 p-md-4">
+        <h5 class="fw-bold mb-3">Expense Records</h5>
+        {% if expenses %}
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Category</th>
+                        <th>Amount (INR)</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in expenses %}
+                    <tr>
+                        <td class="text-muted small">{{ loop.index }}</td>
+                        <td>
+                            <span class="badge badge-category-{{ item.category }} px-2 py-1 rounded">
+                                <i class="bi bi-dot"></i> {{ item.category }}
+                            </span>
+                        </td>
+                        <td class="fw-bold text-danger">-{{ item.amount|inr }}</td>
+                        <td class="text-muted small">{{ item.date.strftime('%d %b %Y') }}</td>
+                        <td class="text-secondary small">{{ item.description or '—' }}</td>
+                        <td class="text-end">
+                            <div class="d-inline-flex gap-2">
+                                <a href="{{ url_for('expense.edit', id=item.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('expense.delete', id=item.id) }}" onsubmit="return confirm('Are you sure you want to delete this expense of ₹{{ item.amount }}?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-cart-x fs-1 text-secondary d-block mb-2"></i>
+            <p class="mb-3">No expense entries found for the selected filter.</p>
+            <a href="{{ url_for('expense.add') }}" class="btn btn-danger btn-sm">Record an Expense</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

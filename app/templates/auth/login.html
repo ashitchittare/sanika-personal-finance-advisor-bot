@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Personal Finance Advisor Bot{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center min-vh-75">
+        <div class="col-md-8 col-lg-5">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-dark-slate text-white text-center py-4 border-0">
+                    <div class="brand-icon-wrap mx-auto mb-2">
+                        <i class="bi bi-wallet2 text-emerald"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Welcome Back</h4>
+                    <p class="text-muted-custom small mb-0">Sign in to your FinBot Personal Finance account</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" action="{{ url_for('auth.login') }}">
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold small text-secondary">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control bg-light border-start-0 ps-0" id="email" name="email" value="{{ email or '' }}" placeholder="you@example.com" required autofocus>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-semibold small text-secondary">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+                                <input type="password" class="form-control bg-light border-start-0 ps-0" id="password" name="password" placeholder="Enter your password" required>
+                            </div>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                            <label class="form-check-label small text-secondary" for="remember">
+                                Remember this device
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold rounded-3 mb-3 shadow-sm">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                        </button>
+                    </form>
+
+                    <!-- Quick Demo Fill Helper -->
+                    <div class="p-3 bg-light rounded-3 border text-center mb-3">
+                        <span class="d-block small text-muted mb-2">💡 <strong>Quick Demo Credentials:</strong></span>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="fillDemo('demo@finbot.com', 'Demo@1234')">
+                                Demo User (Sanika)
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="fillDemo('student@finbot.com', 'Student@1234')">
+                                Student User (Aarav)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <span class="small text-muted">Don't have an account? </span>
+                        <a href="{{ url_for('auth.register') }}" class="small fw-semibold text-primary text-decoration-none">Create an Account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function fillDemo(email, pass) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = pass;
+}
+</script>
+{% endblock %}

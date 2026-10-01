@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Goal - Personal Finance Advisor Bot{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-pencil-square me-2 text-primary"></i> Edit Financial Goal
+                    </h5>
+                    <a href="{{ url_for('goals.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                        <i class="bi bi-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="title" class="form-label fw-semibold small text-secondary">Goal Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ goal.title }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="target_amount" class="form-label fw-semibold small text-secondary">Target Amount (₹ INR) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-primary fw-bold">₹</span>
+                                <input type="number" step="100" min="1" class="form-control" id="target_amount" name="target_amount" value="{{ goal.target_amount }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="current_amount" class="form-label fw-semibold small text-secondary">Current Saved Amount (₹ INR) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-success fw-bold">₹</span>
+                                <input type="number" step="100" min="0" class="form-control" id="current_amount" name="current_amount" value="{{ goal.current_amount }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="target_date" class="form-label fw-semibold small text-secondary">Target Date *</label>
+                            <input type="date" class="form-control" id="target_date" name="target_date" value="{{ goal.target_date.strftime('%Y-%m-%d') }}" required>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1 py-2 rounded-3">
+                                <i class="bi bi-check-lg me-1"></i> Update Goal
+                            </button>
+                            <a href="{{ url_for('goals.index') }}" class="btn btn-light py-2 rounded-3">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

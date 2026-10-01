@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Personal Finance Advisor Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4">
+    <!-- Page Header & Quick Actions -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Financial Dashboard</h2>
+            <p class="text-muted small mb-0">Overview for <span class="fw-semibold text-dark">{{ overview.month_name }}</span> &bull; Welcome back, {{ current_user.name }}!</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('income.add') }}" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Add Income
+            </a>
+            <a href="{{ url_for('expense.add') }}" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm">
+                <i class="bi bi-dash-circle me-1"></i> Add Expense
+            </a>
+            <a href="{{ url_for('savings.index') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                <i class="bi bi-piggy-bank me-1"></i> Deposit Savings
+            </a>
+            <a href="{{ url_for('finbot.index') }}" class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm fw-semibold">
+                <i class="bi bi-robot me-1"></i> FinBot Advice
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 Top Key Metric Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Total Income -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card stat-card stat-income h-100 p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-bold">Total Income</span>
+                        <h3 class="fw-bold text-dark mt-2 mb-0">{{ overview.total_income|inr }}</h3>
+                        <small class="text-success fw-semibold">
+                            <i class="bi bi-calendar-check me-1"></i>{{ overview.month_income|inr }} this month
+                        </small>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-wallet-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Expenses -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card stat-card stat-expense h-100 p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-bold">Total Expenses</span>
+                        <h3 class="fw-bold text-dark mt-2 mb-0">{{ overview.total_expense|inr }}</h3>
+                        <small class="text-danger fw-semibold">
+                            <i class="bi bi-calendar-x me-1"></i>{{ overview.month_expense|inr }} this month
+                        </small>
+                    </div>
+                    <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                        <i class="bi bi-credit-card-2-front-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Savings -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card stat-card stat-savings h-100 p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-bold">Current Savings</span>
+                        <h3 class="fw-bold text-dark mt-2 mb-0">{{ overview.current_savings|inr }}</h3>
+                        <small class="text-primary fw-semibold">
+                            <i class="bi bi-graph-up-arrow me-1"></i>{{ overview.month_savings|inr }} this month
+                        </small>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-piggy-bank-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Net / Monthly Balance -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card stat-card stat-balance h-100 p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-bold">Net Balance</span>
+                        <h3 class="fw-bold {% if overview.net_balance >= 0 %}text-success{% else %}text-danger{% endif %} mt-2 mb-0">
+                            {{ overview.net_balance|inr }}
+                        </h3>
+                        <small class="text-muted fw-semibold">
+                            Monthly: <span class="{% if overview.month_balance >= 0 %}text-success{% else %}text-danger{% endif %}">{{ overview.month_balance|inr }}</span>
+                        </small>
+                    </div>
+                    <div class="stat-icon bg-purple bg-opacity-10 text-purple" style="background-color: #ede9fe; color: #7c3aed;">
+                        <i class="bi bi-cash-coin"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Score & FinBot Teaser Banner -->
+    <div class="card bg-dark-slate text-white p-3 p-md-4 mb-4 border-0 rounded-4 shadow">
+        <div class="row align-items-center g-3">
+            <div class="col-md-7">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="badge bg-warning text-dark p-2 rounded-3 fs-4">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Financial Health: <span class="text-warning">{{ health.score }}/100 ({{ health.rating }})</span></h5>
+                        <p class="text-light text-opacity-75 small mb-0">
+                            {% for ins in health.insights[:2] %}
+                                &bull; {{ ins }} 
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 text-md-end">
+                <a href="{{ url_for('finbot.index') }}" class="btn btn-warning fw-semibold rounded-pill px-4 shadow-sm">
+                    Open FinBot Advisor <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <!-- Income vs Expense Bar Chart -->
+        <div class="col-lg-8">
+            <div class="card h-100 p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Income vs Expense Trends</h5>
+                    <span class="badge bg-light text-secondary border">Last 6 Months</span>
+                </div>
+                <div style="height: 290px;">
+                    <canvas id="incomeExpenseChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense Category Breakdown Doughnut Chart -->
+        <div class="col-lg-4">
+            <div class="card h-100 p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Expense Breakdown</h5>
+                    <span class="badge bg-light text-secondary border">This Month</span>
+                </div>
+                <div style="height: 290px;">
+                    <canvas id="categoryDoughnutChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Section: Recent Transactions & Financial Goals -->
+    <div class="row g-4">
+        <!-- Recent Transactions -->
+        <div class="col-lg-7">
+            <div class="card h-100 p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Recent Activity</h5>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('income.index') }}" class="btn btn-sm btn-outline-success">View Income</a>
+                        <a href="{{ url_for('expense.index') }}" class="btn btn-sm btn-outline-danger">View Expenses</a>
+                    </div>
+                </div>
+                
+                {% if recent_transactions %}
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Category / Source</th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in recent_transactions %}
+                            <tr>
+                                <td>
+                                    {% if t.is_income %}
+                                        <span class="badge bg-success bg-opacity-10 text-success fw-semibold">
+                                            <i class="bi bi-arrow-down-left"></i> Income
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger bg-opacity-10 text-danger fw-semibold">
+                                            <i class="bi bi-arrow-up-right"></i> Expense
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-semibold text-dark">{{ t.category_or_source }}</td>
+                                <td class="text-muted small">{{ t.date.strftime('%d %b %Y') }}</td>
+                                <td class="text-muted small text-truncate" style="max-width: 160px;">{{ t.description or '—' }}</td>
+                                <td class="text-end fw-bold {% if t.is_income %}text-success{% else %}text-danger{% endif %}">
+                                    {% if t.is_income %}+{% else %}-{% endif %}{{ t.amount|inr }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-receipt-cutoff fs-1 d-block mb-2 text-secondary"></i>
+                    <p class="mb-2">No transactions recorded yet.</p>
+                    <a href="{{ url_for('income.add') }}" class="btn btn-sm btn-primary">Add Your First Record</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Goals Progress Quick View -->
+        <div class="col-lg-5">
+            <div class="card h-100 p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Financial Goals</h5>
+                    <a href="{{ url_for('goals.index') }}" class="btn btn-sm btn-outline-primary">Manage Goals</a>
+                </div>
+
+                {% if goals %}
+                <div class="d-flex flex-column gap-3">
+                    {% for g in goals %}
+                    <div class="p-3 bg-light rounded-3 border">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-semibold text-dark">{{ g.title }}</span>
+                            <span class="badge {% if g.is_completed %}bg-success{% else %}bg-primary{% endif %} rounded-pill">
+                                {{ g.progress_percentage }}%
+                            </span>
+                        </div>
+                        <div class="progress progress-thin mb-2">
+                            <div class="progress-bar {% if g.is_completed %}bg-success{% else %}bg-primary{% endif %}" role="progressbar" style="width: {{ g.progress_percentage }}%;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>Saved: <strong class="text-dark">{{ g.current_amount|inr }}</strong></span>
+                            <span>Target: <strong class="text-dark">{{ g.target_amount|inr }}</strong></span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-bullseye fs-1 d-block mb-2 text-secondary"></i>
+                    <p class="mb-2">No active financial goals.</p>
+                    <a href="{{ url_for('goals.index') }}" class="btn btn-sm btn-outline-primary">Create a Goal</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Trends data from backend
+    const trendsData = {{ trends|tojson }};
+    const categoryData = {{ category_data|tojson }};
+
+    initIncomeExpenseChart('incomeExpenseChart', trendsData);
+    initCategoryDoughnutChart('categoryDoughnutChart', categoryData);
+});
+</script>
+{% endblock %}

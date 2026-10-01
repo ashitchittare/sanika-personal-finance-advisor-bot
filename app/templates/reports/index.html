@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Financial Reports - Personal Finance Advisor Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4">
+    <!-- Header with Month/Year Filter -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Financial Reports & Analytics</h2>
+            <p class="text-muted small mb-0">In-depth breakdown of your monthly income, expenditure, budget adherence, and savings trends.</p>
+        </div>
+        <form method="GET" action="{{ url_for('reports.index') }}" class="d-flex gap-2 align-items-center bg-white p-2 rounded-3 shadow-sm border">
+            <label class="small text-secondary fw-semibold ps-1">Period:</label>
+            <select name="month" class="form-select form-select-sm" onchange="this.form.submit()">
+                {% for m in range(1, 13) %}
+                <option value="{{ m }}" {% if selected_month == m %}selected{% endif %}>
+                    {{ ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][m-1] }}
+                </option>
+                {% endfor %}
+            </select>
+            <select name="year" class="form-select form-select-sm" onchange="this.form.submit()">
+                {% for y in years %}
+                <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- Monthly Summary Stat Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card p-3 h-100 border-0 shadow-sm stat-card stat-income">
+                <span class="text-muted small text-uppercase fw-bold">Month Income</span>
+                <h3 class="fw-bold text-success mb-0 mt-2">{{ month_income|inr }}</h3>
+                <small class="text-muted">{{ month_name }}</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card p-3 h-100 border-0 shadow-sm stat-card stat-expense">
+                <span class="text-muted small text-uppercase fw-bold">Month Expenses</span>
+                <h3 class="fw-bold text-danger mb-0 mt-2">{{ month_expense|inr }}</h3>
+                <small class="text-muted">{{ month_name }}</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card p-3 h-100 border-0 shadow-sm stat-card stat-savings">
+                <span class="text-muted small text-uppercase fw-bold">Month Savings</span>
+                <h3 class="fw-bold text-primary mb-0 mt-2">{{ month_savings|inr }}</h3>
+                <small class="text-muted">{{ month_name }}</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card p-3 h-100 border-0 shadow-sm stat-card stat-balance">
+                <span class="text-muted small text-uppercase fw-bold">Net Cash Flow</span>
+                <h3 class="fw-bold {% if net_balance >= 0 %}text-success{% else %}text-danger{% endif %} mb-0 mt-2">
+                    {{ net_balance|inr }}
+                </h3>
+                <small class="text-muted">{{ 'Surplus' if net_balance >= 0 else 'Deficit' }}</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <!-- 12-Month Trend Chart -->
+        <div class="col-lg-8">
+            <div class="card h-100 p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">12-Month Income vs Expense Trend</h5>
+                    <span class="badge bg-light text-secondary border">Annual History</span>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="annualTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Breakdown Chart -->
+        <div class="col-lg-4">
+            <div class="card h-100 p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Category Breakdown</h5>
+                    <span class="badge bg-light text-secondary border">{{ month_name }}</span>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="categoryReportChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Expense Table & Budget vs Actual -->
+    <div class="row g-4">
+        <!-- Category-wise Table -->
+        <div class="col-lg-6">
+            <div class="card h-100 p-3 p-md-4">
+                <h5 class="fw-bold mb-3">Category-Wise Expenses</h5>
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Share (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in category_data['items'] %}
+                            {% if item.amount > 0 %}
+                            <tr>
+                                <td>
+                                    <span class="badge badge-category-{{ item.category }} px-2 py-1 rounded">
+                                        {{ item.category }}
+                                    </span>
+                                </td>
+                                <td class="fw-bold text-dark">{{ item.amount|inr }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                            <div class="progress-bar" style="width: {{ item.percentage }}%; background-color: {{ item.color }};"></div>
+                                        </div>
+                                        <span class="small text-muted">{{ item.percentage }}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                            {% if category_data.total == 0 %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">No expenses recorded for {{ month_name }}.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget vs Actual Variance Table -->
+        <div class="col-lg-6">
+            <div class="card h-100 p-3 p-md-4">
+                <h5 class="fw-bold mb-3">Budget vs Actual Variance</h5>
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Budget</th>
+                                <th>Actual</th>
+                                <th>Variance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in budget_report.categories %}
+                            {% if b.has_budget or b.spent > 0 %}
+                            <tr>
+                                <td class="fw-semibold text-dark">{{ b.category }}</td>
+                                <td>{{ b.budget|inr }}</td>
+                                <td class="fw-semibold">{{ b.spent|inr }}</td>
+                                <td>
+                                    {% if b.is_overspent and b.has_budget %}
+                                        <span class="badge bg-danger rounded-pill">Over by ₹{{ b.remaining|abs }}</span>
+                                    {% elif b.has_budget %}
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill">Under by ₹{{ b.remaining }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill">No budget</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const trendsData = {{ trends|tojson }};
+    const categoryData = {{ category_data|tojson }};
+
+    initIncomeExpenseChart('annualTrendChart', trendsData);
+    initCategoryDoughnutChart('categoryReportChart', categoryData);
+});
+</script>
+{% endblock %}

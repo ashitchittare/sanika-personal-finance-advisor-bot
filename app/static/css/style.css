@@ -1,0 +1,222 @@
+/* Personal Finance Advisor Bot Custom Styling */
+
+:root {
+    --brand-primary: #2563eb;
+    --brand-primary-hover: #1d4ed8;
+    --brand-emerald: #10b981;
+    --brand-emerald-dark: #059669;
+    --brand-dark-slate: #0f172a;
+    --brand-card-bg: #ffffff;
+    --brand-border: #e2e8f0;
+    --brand-text-main: #1e293b;
+    --brand-text-muted: #64748b;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--brand-text-main);
+    background-color: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+.bg-dark-slate {
+    background-color: var(--brand-dark-slate) !important;
+}
+
+.text-emerald {
+    color: var(--brand-emerald) !important;
+}
+
+.bg-emerald {
+    background-color: var(--brand-emerald) !important;
+}
+
+.brand-icon-wrap {
+    width: 38px;
+    height: 38px;
+    background: rgba(16, 185, 129, 0.15);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.nav-pills-custom .nav-link {
+    color: #cbd5e1;
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-pills-custom .nav-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-pills-custom .nav-link.active {
+    color: #ffffff;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-link-ai.active {
+    background: rgba(245, 158, 11, 0.15) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: #fbbf24 !important;
+}
+
+.avatar-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #10b981);
+    color: white;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+.text-muted-custom {
+    color: #94a3b8 !important;
+}
+
+/* Card Styling */
+.card {
+    border-radius: 14px;
+    border: 1px solid var(--brand-border);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background-color: var(--brand-card-bg);
+}
+
+.card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: transparent;
+}
+
+.stat-card.stat-income::before { background: #10b981; }
+.stat-card.stat-expense::before { background: #ef4444; }
+.stat-card.stat-savings::before { background: #3b82f6; }
+.stat-card.stat-balance::before { background: #8b5cf6; }
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Table styling */
+.table-custom th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.table-custom td {
+    vertical-align: middle;
+    padding: 0.85rem 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* FinBot Chat Interface */
+.finbot-chat-container {
+    height: 460px;
+    overflow-y: auto;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.25rem;
+    border: 1px solid #e2e8f0;
+}
+
+.chat-bubble {
+    max-width: 85%;
+    padding: 0.9rem 1.2rem;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    line-height: 1.55;
+    font-size: 0.95rem;
+}
+
+.chat-bubble-bot {
+    background-color: #ffffff;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+    border-top-left-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.chat-bubble-user {
+    background-color: var(--brand-primary);
+    color: #ffffff;
+    border-top-right-radius: 4px;
+    margin-left: auto;
+}
+
+.quick-prompt-btn {
+    font-size: 0.82rem;
+    border-radius: 20px;
+    padding: 0.35rem 0.85rem;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.quick-prompt-btn:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+/* Category Badges */
+.badge-category-Food { background-color: #ffe4e6; color: #e11d48; }
+.badge-category-Transport { background-color: #e0f2fe; color: #0284c7; }
+.badge-category-Education { background-color: #fef3c7; color: #d97706; }
+.badge-category-Rent { background-color: #ccfbf1; color: #0d9488; }
+.badge-category-Shopping { background-color: #ede9fe; color: #7c3aed; }
+.badge-category-Entertainment { background-color: #ffedd5; color: #ea580c; }
+.badge-category-Healthcare { background-color: #fee2e2; color: #dc2626; }
+.badge-category-Bills { background-color: #dcfce7; color: #16a34a; }
+.badge-category-Other { background-color: #f1f5f9; color: #475569; }
+
+/* Progress meters */
+.progress-thin {
+    height: 8px;
+    border-radius: 10px;
+    background-color: #e2e8f0;
+}
