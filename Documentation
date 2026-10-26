@@ -1,0 +1,247 @@
+Personal Finance Advisor Bot (FinBot)
+Project Documentation
+1. Introduction
+
+The Personal Finance Advisor Bot (FinBot) is a web-based financial management application designed to help users record, organize, and analyze their personal finances. It combines financial tracking tools with an AI-powered advisor to provide insights into spending habits, budgets, savings, and financial goals.
+
+The application uses Python and Flask for backend processing, SQLite for data storage, and Google Gemini for AI-generated financial guidance. A rule-based local fallback allows the advisor to provide recommendations when the Gemini API is unavailable.
+
+2. Objectives
+Provide secure user registration and authentication.
+Track income and expenses in an organized manner.
+Help users create and monitor monthly budgets.
+Track savings deposits and financial goals.
+Generate financial summaries, reports, and charts.
+Provide personalized financial insights through an AI advisor.
+Maintain separation between individual users' financial records.
+3. Main Features
+
+3.1 User Authentication
+
+Users can register, log in, and log out. Passwords are hashed using Werkzeug, and authenticated sessions are managed with Flask-Login.
+
+3.2 Financial Dashboard
+
+The dashboard displays key financial indicators, including total income, total expenses, savings, net balance, recent transactions, and goal progress. Charts provide a visual comparison of income and expenses.
+
+3.3 Income Management
+
+Users can add, view, edit, and delete income records. Income sources may include salary, freelance work, investments, or business income.
+
+3.4 Expense Management
+
+Users can manage expenses and assign them to categories such as Food, Transport, Education, Rent, Shopping, Entertainment, Healthcare, Bills, and Other.
+
+3.5 Budget Planning
+
+Users can establish monthly spending limits for expense categories. The application compares recorded spending against the allocated budget and highlights overspending.
+
+3.6 Savings Tracking
+
+Users can record savings deposits, dates, and notes about their intended use, such as an emergency fund or investment.
+
+3.7 Financial Goal Tracking
+
+Users can define financial goals with target amounts and dates, update their saved amounts, and monitor progress toward each target.
+
+3.8 Reports and Analytics
+
+The application generates monthly financial summaries, category-level spending breakdowns, historical trends, budget variance information, and a financial health scorecard.
+
+3.9 AI Financial Advisor
+
+FinBot uses Google Gemini to generate financial guidance based on available user financial data. If the API key is not configured or the service is unavailable, the application can use a local rule-based recommendation engine.
+
+4. Technology Stack
+Component	Technology
+Programming language	Python 3.10+
+Web framework	Flask
+Database	SQLite
+Database ORM	Flask-SQLAlchemy
+Authentication	Flask-Login
+Password security	Werkzeug
+Frontend	HTML5, CSS3, JavaScript
+UI framework	Bootstrap 5.3
+Charts	Chart.js 4.4
+AI integration	Google Gemini API
+Automated testing	Pytest
+Production server	Gunicorn
+5. System Architecture
+
+The application follows a layered architecture.
+
+Presentation layer: HTML templates, CSS, JavaScript, and charts provide the user interface.
+Routing layer: Flask routes handle authentication, transactions, budgeting, savings, goals, reports, and advisor requests.
+Service layer: Financial analytics and AI advisor services perform calculations and recommendation generation.
+Data layer: SQLAlchemy models represent users and financial records stored in SQLite.
+AI integration layer: The Gemini API provides AI-generated responses, with a rule-based fallback for offline operation.
+6. Database Design
+
+The application includes the following principal data models:
+
+User: Account information and authentication data.
+Income: Income amount, source, date, and description.
+Expense: Expense amount, category, date, and description.
+Budget: Monthly budget allocations for expense categories.
+Savings: Savings deposits and associated notes.
+Goal: Financial targets, target dates, and progress amounts.
+
+Financial records are associated with their respective users to support data isolation. The exact field definitions and database relationships should be confirmed against the model files in the source code.
+
+7. Project Directory Structure
+text
+sanika-personal-finance-advisor-bot/
+├── app/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── extensions.py
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   ├── static/
+│   │   ├── css/
+│   │   └── js/
+│   └── templates/
+├── tests/
+├── .env.example
+├── requirements.txt
+├── run.py
+├── seed_data.py
+└── README.md
+
+
+Directory responsibilities
+
+app/models/: Database models and financial data entities.
+app/routes/: HTTP endpoints and application controllers.
+app/services/: Financial calculations and AI recommendation logic.
+app/templates/: HTML pages rendered by Flask.
+app/static/: Stylesheets and frontend JavaScript.
+tests/: Automated tests for application functionality.
+run.py: Application entry point.
+seed_data.py: Script for populating the database with demonstration data.
+.env.example: Example environment configuration.
+8. Installation and Setup
+
+Prerequisites
+
+Python 3.10 or later.
+Git.
+A terminal or command prompt.
+An optional Google Gemini API key for AI-powered responses.
+
+Step 1: Clone the repository
+
+bash
+git clone https://github.com/ashitchittare/sanika-personal-finance-advisor-bot.git
+cd sanika-personal-finance-advisor-bot
+
+
+Step 2: Create a virtual environment
+
+bash
+python -m venv .venv
+
+
+Activate it on Windows PowerShell:
+
+powershell
+.venv\Scripts\Activate.ps1
+
+
+On macOS or Linux:
+
+bash
+source .venv/bin/activate
+
+
+Step 3: Install dependencies
+
+bash
+pip install -r requirements.txt
+
+
+Step 4: Configure environment variables
+
+Copy .env.example to .env.
+
+On Windows:
+
+powershell
+Copy-Item .env.example .env
+
+
+On macOS or Linux:
+
+bash
+cp .env.example .env
+
+
+Configure the required settings:
+
+env
+SECRET_KEY=replace-with-a-secure-random-secret
+DATABASE_URL=sqlite:///instance/finance.db
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+PORT=5000
+FLASK_ENV=development
+
+
+Keep production secrets private. A Gemini API key is optional if the local fallback advisor is sufficient.
+
+Step 5: Initialize demonstration data
+
+bash
+python seed_data.py
+
+
+Use demonstration accounts only for testing. Change or remove seeded credentials before any public deployment.
+
+Step 6: Start the application
+
+bash
+python run.py
+
+
+Open http://localhost:5000 in a web browser.
+
+9. Testing
+
+Run the automated test suite using:
+
+bash
+pytest -v
+
+
+The repository documentation describes tests covering authentication, CRUD operations, financial calculations, user data isolation, database initialization, and AI advisor fallback behavior.
+
+Test results should be recorded after running the tests in the actual development environment.
+
+10. Security Considerations
+Hash passwords rather than storing plaintext passwords.
+Use a strong, randomly generated Flask secret key.
+Keep .env and database files out of version control.
+Check record ownership before allowing users to view, update, or delete financial records.
+Use HTTPS in production.
+Protect API credentials and avoid logging sensitive financial information.
+Review database backup, retention, and access policies before storing real financial data.
+11. Limitations
+AI-generated recommendations may be inaccurate or incomplete.
+The quality of AI guidance depends on the available financial data and model responses.
+The local fallback provides rule-based recommendations rather than full generative AI.
+SQLite may not be the best database choice for a high-concurrency production deployment.
+The application's financial health score and other analytical outputs should not be treated as professional financial advice without independent validation.
+12. Future Enhancements
+Import bank statements and automatically categorize transactions.
+Add recurring transaction management and reminders.
+Provide configurable financial reports and export options.
+Introduce stronger multi-factor authentication.
+Add more comprehensive financial forecasting and anomaly detection.
+Support additional AI providers and more extensive offline analytics.
+Expand automated tests and monitoring for production use.
+13. Conclusion
+
+The Personal Finance Advisor Bot integrates personal financial record management, budgeting, savings and goal tracking, analytics, and AI-assisted recommendations into one web application. Its modular Flask architecture supports further development, while its local recommendation fallback helps preserve basic advisory functionality when the external AI service is unavailable.
+
+The project is suitable as a foundation for learning full-stack web development, database-backed applications, financial analytics, and AI integration. Before production use, security controls, calculations, persistence, and deployment settings should be independently verified.
